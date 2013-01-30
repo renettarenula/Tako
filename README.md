@@ -8,4 +8,4 @@ Installation
 
 1. Upload the file to your plugins folder.
 2. Activate the plugin through WordPress.
-3. Move a comment through the 'Move comments with Tako' metabox in your edit comments page.
+3. Move a comment through the metabox in your edit comments page.
