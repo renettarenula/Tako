@@ -117,15 +117,29 @@ class Tako
 		if ( !current_user_can( 'moderate_comments' ) )  {
 			return;
 		}
-		global $wpdb;
+		global $wpdb, $comment;
 		$post_type = (string) $_POST['tako_post_type'];
 		$comment_post_ID = $post_type == 'post' ? (int) $_POST['tako_post'] : (int) $_POST['tako_page'];
 		$comment_ID = (int) $_POST['comment_ID'];
+		$comments_args = array( 'parent' => $comment_ID );
+		$comments = get_comments( $comments_args );
+		$comments_id = array();
+		foreach( $comments as $comment ) {
+			$comments_id[] = $comment->comment_ID;
+		}
 		$post = get_post( $comment_post_ID );
 		if ( !$post )
 			return $comment_content;
 		$new = compact( 'comment_post_ID' );
-		$update = $wpdb->update( $wpdb->comments, $new, compact( 'comment_ID' ) );
+		$curr = compact( 'comment_ID' );
+		if ( !$comments ) {
+			$update = $wpdb->update( $wpdb->comments, $new, compact( 'comment_ID' ) );
+		}
+		else {
+			$var = array_merge( $comments_id, compact( 'comment_ID' ) );
+			$val = implode(',', $var);
+			$wpdb->query( "UPDATE $wpdb->comments SET comment_post_ID = $comment_post_ID WHERE comment_ID IN ( $val )" );
+		}
 		wp_update_comment_count( $comment_post_ID );
 		return $comment_content;	
 	}
