@@ -128,16 +128,18 @@ class Tako
 			$comments_id[] = $comment->comment_ID;
 		}
 		$post = get_post( $comment_post_ID );
+		// if the post ID doesn't exist
 		if ( !$post )
 			return $comment_content;
 		$new = compact( 'comment_post_ID' );
 		$curr = compact( 'comment_ID' );
+		// if there are no nested comments
 		if ( !$comments ) {
 			$update = $wpdb->update( $wpdb->comments, $new, compact( 'comment_ID' ) );
 		}
 		else {
 			$var = array_merge( $comments_id, compact( 'comment_ID' ) );
-			$val = implode(',', $var);
+			$val = implode( ',', array_map( 'intval', $var ) );
 			$wpdb->query( "UPDATE $wpdb->comments SET comment_post_ID = $comment_post_ID WHERE comment_ID IN ( $val )" );
 		}
 		wp_update_comment_count( $comment_post_ID );
