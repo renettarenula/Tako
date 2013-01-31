@@ -1,7 +1,7 @@
 <?php
 /**
  * @package Tako Movable Comments
- * @author Aysha Anggraini
+ * @author Ren Aysha
  * @version 1.0
  */
 /*
