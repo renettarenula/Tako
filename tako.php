@@ -81,16 +81,18 @@ class Tako
 			'echo'     => 1,
 			'name'     => 'tako_page');
 		$current_post = get_the_title( $comment->comment_post_ID );
+		$post_types = get_post_types( '', 'names' );
 	?>
 		<p><?php _e( 'This comment currently belongs to a post called ', 'tako_lang') ?><em><strong><?php echo $current_post; ?></em></strong></p>
 		<div id = "tako-post-types">
 		<label for="post-type"><?php _e( 'Choose the post type that you want to move this comment to', 'tako_lang' ); ?></label>
 		<select name="tako_post_type" id="tako_post_type">
-			<option value="page" <?php if ( get_post_type( $comment->comment_post_ID ) == "page" ) echo 'selected'; ?>>Page</option>
-			<option value="post" <?php if ( get_post_type( $comment->comment_post_ID ) == "post" ) echo 'selected'; ?>>Post</option>
+			<?php foreach( $post_types as $post_type ) { ?>
+				<option value="<? echo $post_type; ?>" <?php if ( get_post_type( $comment->comment_post_ID ) == $post_type ) echo 'selected'; ?>><?php echo $post_type; ?></option>
+		  	<?php } ?>
 		</select>
 		</div>
-		<br /><br />
+		<br />
 		<div id = "tako-post">
 		<label for="post"><?php _e( 'Choose the post that you want to move this comment to', 'tako_lang')?></label>
 		<select name="tako_post" id="tako_post">
@@ -99,7 +101,7 @@ class Tako
 		<?php endforeach; ?>
 		</select>
 		</div>
-		<br /><br />
+		<br />
 		<div id = "tako-pages">
 		<label for="page"><?php _e( 'Choose the page that you want to move this comment to', 'tako_lang')?></label>
 		<?php wp_dropdown_pages( $pargs ); ?>
@@ -138,12 +140,42 @@ class Tako
 			$update = $wpdb->update( $wpdb->comments, $new, compact( 'comment_ID' ) );
 		}
 		else {
-			$var = array_merge( $comments_id, compact( 'comment_ID' ) );
+			$var = array_merge( $this->tako_get_subcomments( $comments_id ), compact( 'comment_ID' ) );
 			$val = implode( ',', array_map( 'intval', $var ) );
 			$wpdb->query( "UPDATE $wpdb->comments SET comment_post_ID = $comment_post_ID WHERE comment_ID IN ( $val )" );
 		}
 		wp_update_comment_count( $comment_post_ID );
 		return $comment_content;	
+	}	
+
+	/**
+	 * The method that is responsible for getting all the nested comments under one comment.
+	 * This method will check if there are subcomments available under each subcomments.
+	 * @param array $comments	This is an array of comments. These comments are subcomments of the comment that the user wants to move
+	 */
+	function tako_get_subcomments( $comments ) {
+		global $wpdb;
+		// implode the array; this is the current 'parent'
+		$parents = implode( ',', $comments );
+		// this will store all the subcomments
+		$nested = array();
+		do {
+			// initializing the an array (or emptying the array)
+			$subs = array();
+			// get the subcomments under the parent
+			$subcomments = $wpdb->get_results( "SELECT comment_ID FROM $wpdb->comments WHERE comment_parent IN ( $parents )" );
+			// store the subcomment under $subs and $nested
+			foreach( $subcomments as $subcomment ) {
+				$subs[] = $subcomment->comment_ID;
+				$nested[] = $subcomment->comment_ID;
+			}
+			// implode the array and assign it as parents
+			$parents = implode( ',', $subs );
+		// loop will stop once $subs is empty
+		} while( !empty( $subs ) );
+		// merge all the subcomments with the initial parent comments
+		$merge = array_merge( $comments, $nested );
+		return $merge;
 	}
 }
 $tako = new Tako();
