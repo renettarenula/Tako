@@ -29,7 +29,6 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 */
-
 class Tako
 {
 	/*--------------------------------------------*
@@ -43,7 +42,9 @@ class Tako
 	{
 		add_action( 'add_meta_boxes', array( &$this, 'tako_add_meta_box' ) );
 		add_filter( 'comment_save_pre', array( &$this, 'tako_save_meta_box' ) );
-		wp_enqueue_script('dropdown', '/wp-content/plugins/tako/js/dropdown.js');
+		wp_enqueue_script('tako_dropdown', '/wp-content/plugins/tako/js/dropdown.js');
+		wp_localize_script( 'tako_dropdown', 'ajax_object', array( 'ajax_url' => admin_url( 'admin-ajax.php' ), 'we_value' => $email_nonce ) );
+		add_action('wp_ajax_tako_chosen_post_type', array( &$this, 'tako_chosen_post_type_callback' ));
 	}
 
 	/*--------------------------------------------*
@@ -84,6 +85,7 @@ class Tako
 		$post_types = get_post_types( '', 'names' );
 	?>
 		<p><?php _e( 'This comment currently belongs to a post called ', 'tako_lang') ?><em><strong><?php echo $current_post; ?></em></strong></p>
+		<div id="current_comment" style="display:none;"><?php echo $comment->comment_post_ID?></div>
 		<div id = "tako-post-types">
 		<label for="post-type"><?php _e( 'Choose the post type that you want to move this comment to', 'tako_lang' ); ?></label>
 		<select name="tako_post_type" id="tako_post_type">
@@ -93,21 +95,10 @@ class Tako
 		</select>
 		</div>
 		<br />
-		<div id = "tako-post">
-		<label for="post"><?php _e( 'Choose the post that you want to move this comment to', 'tako_lang')?></label>
-		<select name="tako_post" id="tako_post">
-		<?php foreach( $posts as $post ) : setup_postdata($post); ?>
-			<option value="<? echo $post->ID; ?>" <?php if ( $post->ID == $comment->comment_post_ID ) echo 'selected'; ?>><?php the_title(); ?></option>
-		<?php endforeach; ?>
-		</select>
-		</div>
-		<br />
-		<div id = "tako-pages">
-		<label for="page"><?php _e( 'Choose the page that you want to move this comment to', 'tako_lang')?></label>
-		<?php wp_dropdown_pages( $pargs ); ?>
-		</div>
+		<div id="dropdown"></div>
 <?php
 	}
+
 	/**
 	 * The method that is responsible in ensuring that the new comment is saved
 	 * @param string $comment_content 	Getting the comment information for the current comment
@@ -121,26 +112,17 @@ class Tako
 		}
 		global $wpdb, $comment;
 		$post_type = (string) $_POST['tako_post_type'];
-		$comment_post_ID = $post_type == 'post' ? (int) $_POST['tako_post'] : (int) $_POST['tako_page'];
+		$comment_post_ID = (int) $_POST['tako_post'];
 		$comment_ID = (int) $_POST['comment_ID'];
-		$comments_args = array( 'parent' => $comment_ID );
-		$comments = get_comments( $comments_args );
-		$comments_id = array();
-		foreach( $comments as $comment ) {
-			$comments_id[] = $comment->comment_ID;
-		}
-		$post = get_post( $comment_post_ID );
-		// if the post ID doesn't exist
-		if ( !$post )
+		if ( !$this->tako_post_exist( $comment_post_ID ) )
 			return $comment_content;
 		$new = compact( 'comment_post_ID' );
-		$curr = compact( 'comment_ID' );
 		// if there are no nested comments
-		if ( !$comments ) {
+		if ( !$this->tako_nested_comments_exist( $comment_ID ) ) {
 			$update = $wpdb->update( $wpdb->comments, $new, compact( 'comment_ID' ) );
 		}
 		else {
-			$var = array_merge( $this->tako_get_subcomments( $comments_id ), compact( 'comment_ID' ) );
+			$var = array_merge( $this->tako_get_subcomments( $this->get_direct_subcomments( $comment_ID ) ), compact( 'comment_ID' ) );
 			$val = implode( ',', array_map( 'intval', $var ) );
 			$wpdb->query( "UPDATE $wpdb->comments SET comment_post_ID = $comment_post_ID WHERE comment_ID IN ( $val )" );
 		}
@@ -152,13 +134,14 @@ class Tako
 	 * The method that is responsible for getting all the nested comments under one comment.
 	 * This method will check if there are subcomments available under each subcomments.
 	 * @param array $comments	This is an array of comments. These comments are subcomments of the comment that the user wants to move
+	 * @return array
 	 */
-	function tako_get_subcomments( $comments ) {
+	public function tako_get_subcomments( $comments ) 
+	{
 		global $wpdb;
 		// implode the array; this is the current 'parent'
 		$parents = implode( ',', $comments );
-		// this will store all the subcomments
-		$nested = array();
+		$nested = array(); // this will store all the subcomments
 		do {
 			// initializing the an array (or emptying the array)
 			$subs = array();
@@ -176,6 +159,65 @@ class Tako
 		// merge all the subcomments with the initial parent comments
 		$merge = array_merge( $comments, $nested );
 		return $merge;
+	}
+
+	/**
+	 * This method is responsible in checking whether nested comments is available
+	 * @param int $comment_ID Comment ID of the comment chosen to be moved
+	 * @return object
+	 */
+	public function tako_nested_comments_exist( $comment_ID ) 
+	{
+		$comments_args = array( 'parent' => $comment_ID );
+		$comments = get_comments( $comments_args );
+		return $comments;
+	}
+
+	/**
+	 * Get the post object that the user had chosen to move the comments to
+	 * @param int $comment_post_ID	The post ID that the user wants to move the comments to
+	 * @return object
+	 */
+	public function tako_post_exist( $comment_post_ID ) 
+	{
+		return get_post( $comment_post_ID );
+	}
+
+	/**
+	 * Get the direct subcomments of the comment that is chosen to be moved
+	 * @param int $comment_ID Comment ID of the comment chosen to be moved
+	 * @return array
+	 */
+	public function get_direct_subcomments( $comment_ID ) 
+	{
+		$comments_args = array( 'parent' => $comment_ID );
+		$comments = get_comments( $comments_args );
+		$comments_id = array();
+		foreach( $comments as $comment ) {
+			$comments_id[] = $comment->comment_ID;
+		}
+		return $comments_id;
+	}
+
+	/**
+	 * Ajax callback for checking which post type is chosen and it will
+	 * print the dropdown list of all post title of the chosen post type.
+	 */
+	public function tako_chosen_post_type_callback() 
+	{
+		global $wpdb;
+		$post_type = $_POST['postype'];
+		$post_id   = (int) $_POST['post_id'];
+		$args  = array( 'numberposts' => -1, 'post_type' => $post_type );
+		$posts = get_posts( $args );
+	?>
+		<label for="post"><?php _e( 'Choose the post that you want to move this comment to', 'tako_lang')?></label>
+		<select name="tako_post" id="tako_post">
+		<?php foreach( $posts as $post ) : setup_postdata( $post ); ?>
+			<option value="<? echo $post->ID; ?>" <?php if ( $post->ID == $post_id ) echo 'selected'; ?>><?php echo $post->post_title ?></option>
+		<?php endforeach; ?>
+	<?php
+        die();
 	}
 }
 $tako = new Tako();
