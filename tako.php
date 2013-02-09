@@ -44,7 +44,7 @@ class Tako
 		add_filter( 'comment_save_pre', array( &$this, 'tako_save_meta_box' ) );
 		wp_enqueue_script('tako_dropdown', '/wp-content/plugins/tako/js/dropdown.js');
 		wp_localize_script( 'tako_dropdown', 'ajax_object', array( 'ajax_url' => admin_url( 'admin-ajax.php' ), 'we_value' => $email_nonce ) );
-		add_action('wp_ajax_tako_chosen_post_type', array( &$this, 'tako_chosen_post_type_callback' ));
+		add_action( 'wp_ajax_tako_chosen_post_type', array( &$this, 'tako_chosen_post_type_callback' ) );
 	}
 
 	/*--------------------------------------------*
@@ -93,6 +93,7 @@ class Tako
 				<option value="<? echo $post_type; ?>" <?php if ( get_post_type( $comment->comment_post_ID ) == $post_type ) echo 'selected'; ?>><?php echo $post_type; ?></option>
 		  	<?php } ?>
 		</select>
+				<img src="<?php echo admin_url('/images/wpspin_light.gif'); ?>" class="waiting" id="tako_spinner" style="display:none;" />
 		</div>
 		<br />
 		<div id="dropdown"></div>
@@ -220,6 +221,7 @@ class Tako
 		<?php foreach( $posts as $post ) : setup_postdata( $post ); ?>
 			<option value="<? echo $post->ID; ?>" <?php if ( $post->ID == $post_id ) echo 'selected'; ?>><?php echo $post->post_title ?></option>
 		<?php endforeach; ?>
+
 	<?php
         die();
 	}
