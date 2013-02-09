@@ -18,10 +18,7 @@ along with Tako.  If not, see <http://www.gnu.org/licenses/>.
 */
 jQuery(document).ready(function($) {
 	var tako_dropdown = $('#tako_post_type'),
-		tako_post = $('#tako-post'),
-		tako_page = $('#tako-pages'),
 		tako_current_comment = $('#current_comment').text();
-	tako_post.add(tako_page).hide(); // initially hide post & page dropdown
 	tako_dropdown.change(function () {
  		current = $(this).find('option:selected').text();
  		// ajax starts here!
