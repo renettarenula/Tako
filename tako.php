@@ -46,10 +46,13 @@ class Tako
 		add_action( 'wp_ajax_tako_chosen_post_type', array( &$this, 'tako_chosen_post_type_callback' ) );
 	}
 
+	/**
+	 * Enqueue the JS file and ensure that it only loads in the edit comment page
+	 */
 	public function tako_load_scripts( $hook ) {
 		if ( $hook != 'comment.php' )
 			return;
-		wp_enqueue_script( 'tako_dropdown', plugins_url( 'js/dropdown.js' , __FILE__ ) );
+		wp_enqueue_script( 'tako_dropdown', plugins_url( 'js/tako-dropdown.js' , __FILE__ ) );
 		wp_localize_script( 'tako_dropdown', 'tako_object', array( tako_ajax_nonce => wp_create_nonce( 'tako-ajax-nonce' ) ) );
 	}
 
@@ -147,7 +150,7 @@ class Tako
 	{
 		global $wpdb;
 		// implode the array; this is the current 'parent'
-		$parents = implode( ',', $comments );
+		$parents = implode( ',', array_map( 'intval', $comments ) );
 		$nested = array(); // this will store all the subcomments
 		do {
 			// initializing the an array (or emptying the array)
@@ -160,7 +163,7 @@ class Tako
 				$nested[] = $subcomment->comment_ID;
 			}
 			// implode the array and assign it as parents
-			$parents = implode( ',', $subs );
+			$parents = implode( ',', array_map( 'intval', $subs ) );
 		// loop will stop once $subs is empty
 		} while( !empty( $subs ) );
 		// merge all the subcomments with the initial parent comments
