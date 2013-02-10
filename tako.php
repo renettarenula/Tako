@@ -217,7 +217,7 @@ class Tako
 	public function tako_chosen_post_type_callback() 
 	{
 		// check nonce
-		if ( !isset( $_POST['tako_ajax_nonce'] ) )
+		if ( !isset( $_POST['tako_ajax_nonce'] ) || !wp_verify_nonce( $_POST['tako_ajax_nonce'], 'tako-ajax-nonce' ) )
 			die( 'Permission Denied!' );
 		global $wpdb;
 		$post_type = $_POST['postype'];
