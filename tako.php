@@ -42,9 +42,15 @@ class Tako
 	{
 		add_action( 'add_meta_boxes', array( &$this, 'tako_add_meta_box' ) );
 		add_filter( 'comment_save_pre', array( &$this, 'tako_save_meta_box' ) );
-		wp_enqueue_script('tako_dropdown', '/wp-content/plugins/tako/js/dropdown.js');
-		wp_localize_script( 'tako_dropdown', 'ajax_object', array( 'ajax_url' => admin_url( 'admin-ajax.php' ), 'we_value' => $email_nonce ) );
+		add_action( 'admin_enqueue_scripts', array( &$this, tako_load_scripts) );
 		add_action( 'wp_ajax_tako_chosen_post_type', array( &$this, 'tako_chosen_post_type_callback' ) );
+	}
+
+	public function tako_load_scripts( $hook ) {
+		if ( $hook != 'comment.php' )
+			return;
+		wp_enqueue_script( 'tako_dropdown', plugins_url( 'js/dropdown.js' , __FILE__ ) );
+		wp_localize_script( 'tako_dropdown', 'tako_object', array( tako_ajax_nonce => wp_create_nonce( 'tako-ajax-nonce' ) ) );
 	}
 
 	/*--------------------------------------------*
@@ -210,6 +216,9 @@ class Tako
 	 */
 	public function tako_chosen_post_type_callback() 
 	{
+		// check nonce
+		if ( !isset( $_POST['tako_ajax_nonce'] ) )
+			die( 'Permission Denied!' );
 		global $wpdb;
 		$post_type = $_POST['postype'];
 		$post_id   = (int) $_POST['post_id'];

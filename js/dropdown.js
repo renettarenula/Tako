@@ -27,10 +27,11 @@ jQuery(document).ready(function($) {
   		var data = {
 			action: 'tako_chosen_post_type',
 			postype: current, // We pass php values differently!
-			post_id: tako_current_comment
+			post_id: tako_current_comment,
+			tako_ajax_nonce: tako_object.tako_ajax_nonce
 		};
 		// We can also pass the url value separately from ajaxurl for front end AJAX implementations
-		jQuery.post(ajax_object.ajax_url, data, function(response) {
+		jQuery.post(ajaxurl, data, function(response) {
 			$("#dropdown").html(response);
 			spinner.hide(); // hide spinner
 		}); 
