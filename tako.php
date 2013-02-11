@@ -105,7 +105,7 @@ class Tako
 				<img src="<?php echo admin_url('/images/wpspin_light.gif'); ?>" class="waiting" id="tako_spinner" style="display:none;" />
 		</div>
 		<br />
-		<div id="dropdown"></div>
+		<div id="tako_dropdown_list"></div>
 <?php
 	}
 
