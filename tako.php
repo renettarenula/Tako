@@ -10,8 +10,7 @@ Version: 1.0
 Plugin URI: http://www.renettarenula.github.com
 Author: Ren Aysha
 Author URI: http://twitter.com/RenettaRenula
-Description: This plugin allows you to move comments from one post/page to another. Just click on edit comments and move 
-your comments through the 'Move Comments with Tako' metabox.
+Description: This plugin allows you to move comments from one post or page to another. You can also move comments across post types and custom post types. Just click on edit comments and move your comments through the <strong>Move Comments with Tako</strong> metabox.
 
 Copyright (C) <2013> <Ren Aysha>
 
@@ -227,7 +226,7 @@ class Tako
 		$args  = array( 'numberposts' => -1, 'post_type' => $post_type );
 		$posts = get_posts( $args );
 	?>
-		<label for="post"><?php _e( 'Choose the post that you want to move this comment to', 'tako_lang')?></label>
+		<label for="post"><?php _e( 'Choose the post title that you want to move this comment to', 'tako_lang')?></label>
 		<select name="tako_post" id="tako_post">
 		<?php foreach( $posts as $post ) : setup_postdata( $post ); ?>
 			<option value="<? echo $post->ID; ?>" <?php if ( $post->ID == $post_id ) echo 'selected'; ?>><?php echo $post->post_title ?></option>
