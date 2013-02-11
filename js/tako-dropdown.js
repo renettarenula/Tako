@@ -19,6 +19,7 @@ along with Tako.  If not, see <http://www.gnu.org/licenses/>.
 jQuery(document).ready(function($) {
 	var tako_dropdown = $('#tako_post_type'),
 		tako_current_comment = $('#current_comment').text(),
+		tako_dropdown = $('#dropdown'),
 		spinner = $('#tako_spinner');
 	tako_dropdown.change(function () {
 		spinner.show(); // show spinner
@@ -32,7 +33,7 @@ jQuery(document).ready(function($) {
 		};
 		// We can also pass the url value separately from ajaxurl for front end AJAX implementations
 		jQuery.post(ajaxurl, data, function(response) {
-			$("#dropdown").html(response);
+			tako_dropdown.html(response);
 			spinner.hide(); // hide spinner
 		}); 
 	}).change();
