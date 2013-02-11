@@ -22,10 +22,6 @@ As of now, there are similar plugins that exist. However, these plugins require 
 
 **== Installation ==**
 
-This section describes how to install the plugin and get it working.
-
-e.g.
-
-1. Upload the Tako folder to the `/wp-content/plugins/` directory
+1. Upload the Tako folder to the *`/wp-content/plugins/`* directory
 2. Activate the plugin through the 'Plugins' menu in WordPress
-3. Click on edit comment and move the comment through the 'Move Comments with Tako' metabox
+3. Click on edit comment and move the comment through the *'Move Comments with Tako'* metabox
