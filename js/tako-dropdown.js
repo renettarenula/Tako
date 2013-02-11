@@ -18,7 +18,7 @@ along with Tako.  If not, see <http://www.gnu.org/licenses/>.
 */
 jQuery(document).ready(function($) {
 	var tako_dropdown = $('#tako_post_type'),
-		tako_current_comment = $('#current_comment').text(),
+		tako_current_comment = $('#tako_current_comment').text(),
 		tako_dropdown_list = $('#tako_dropdown_list'),
 		spinner = $('#tako_spinner');
 	tako_dropdown.change(function () {

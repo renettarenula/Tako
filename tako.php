@@ -94,7 +94,7 @@ class Tako
 		$post_types = get_post_types( '', 'names' );
 	?>
 		<p><?php _e( 'This comment currently belongs to a post called ', 'tako_lang' ) ?><em><strong><?php echo $current_post; ?></em></strong></p>
-		<div id="current_comment" style="display:none;"><?php echo $comment->comment_post_ID?></div>
+		<div id="tako_current_comment" style="display:none;"><?php echo $comment->comment_post_ID ?></div>
 		<div id = "tako-post-types">
 		<label for="post-type"><?php _e( 'Choose the post type that you want to move this comment to', 'tako_lang' ); ?></label>
 		<select name="tako_post_type" id="tako_post_type">
