@@ -121,7 +121,6 @@ class Tako
 			return;
 		}
 		global $wpdb, $comment;
-		$post_type = (string) $_POST['tako_post_type'];
 		$comment_post_ID = (int) $_POST['tako_post'];
 		$comment_ID = (int) $_POST['comment_ID'];
 		if ( !$this->tako_post_exist( $comment_post_ID ) )
