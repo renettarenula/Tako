@@ -28,4 +28,4 @@ Features:
 
 = How do I contact you if I have a question? =
 
-Email me at ren.aysha[at]gmail.com. Please put [tako-movable-comment] on the subject line.
+Email me at ren.aysha[at]gmail.com. Please include [tako-movable-comments] on the subject line.
