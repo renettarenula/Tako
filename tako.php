@@ -6,7 +6,7 @@
  */
 /*
 Plugin Name: Tako Movable Comments
-Version: 1.0
+Version: 1.0.1
 Plugin URI: http://www.renettarenula.github.com
 Author: Ren Aysha
 Author URI: http://twitter.com/RenettaRenula
