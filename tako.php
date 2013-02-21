@@ -2,7 +2,7 @@
 /**
  * @package Tako Movable Comments
  * @author Ren Aysha
- * @version 1.0
+ * @version 1.0.1
  */
 /*
 Plugin Name: Tako Movable Comments
@@ -41,7 +41,7 @@ class Tako
 	{
 		add_action( 'add_meta_boxes', array( &$this, 'tako_add_meta_box' ) );
 		add_filter( 'comment_save_pre', array( &$this, 'tako_save_meta_box' ) );
-		add_action( 'admin_enqueue_scripts', array( &$this, tako_load_scripts) );
+		add_action( 'admin_enqueue_scripts', array( &$this, 'tako_load_scripts') );
 		add_action( 'wp_ajax_tako_chosen_post_type', array( &$this, 'tako_chosen_post_type_callback' ) );
 	}
 
@@ -52,7 +52,7 @@ class Tako
 		if ( $hook != 'comment.php' )
 			return;
 		wp_enqueue_script( 'tako_dropdown', plugins_url( 'js/tako-dropdown.js' , __FILE__ ) );
-		wp_localize_script( 'tako_dropdown', 'tako_object', array( tako_ajax_nonce => wp_create_nonce( 'tako-ajax-nonce' ) ) );
+		wp_localize_script( 'tako_dropdown', 'tako_object', array( 'tako_ajax_nonce' => wp_create_nonce( 'tako-ajax-nonce' ) ) );
 	}
 
 	/*--------------------------------------------*
@@ -98,7 +98,7 @@ class Tako
 		<label for="post-type"><?php _e( 'Choose the post type that you want to move this comment to', 'tako_lang' ); ?></label>
 		<select name="tako_post_type" id="tako_post_type">
 			<?php foreach( $post_types as $post_type ) { ?>
-				<option value="<? echo $post_type; ?>" <?php if ( get_post_type( $comment->comment_post_ID ) == $post_type ) echo 'selected'; ?>><?php echo $post_type; ?></option>
+				<option value="<?php echo $post_type; ?>" <?php if ( get_post_type( $comment->comment_post_ID ) == $post_type ) echo 'selected'; ?>><?php echo $post_type; ?></option>
 		  	<?php } ?>
 		</select>
 				<img src="<?php echo admin_url('/images/wpspin_light.gif'); ?>" class="waiting" id="tako_spinner" style="display:none;" />
@@ -229,7 +229,7 @@ class Tako
 		<label for="post"><?php _e( 'Choose the post title that you want to move this comment to', 'tako_lang')?></label>
 		<select name="tako_post" id="tako_post">
 		<?php foreach( $posts as $post ) : setup_postdata( $post ); ?>
-			<option value="<? echo $post->ID; ?>" <?php if ( $post->ID == $post_id ) echo 'selected'; ?>><?php echo $post->post_title ?></option>
+			<option value="<?php echo $post->ID; ?>" <?php if ( $post->ID == $post_id ) echo 'selected'; ?>><?php echo $post->post_title ?></option>
 		<?php endforeach; ?>
 
 	<?php
