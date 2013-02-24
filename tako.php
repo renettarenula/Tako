@@ -116,7 +116,7 @@ class Tako
 	public function tako_save_meta_box( $comment_content ) 
 	{
 		$screen = get_current_screen();
-		// if current screen is anything other than edit-comments (main page for editing comments), ignore nonce verification.
+		// For Quick Edit: if current screen is anything other than edit-comments (main page for editing comments), ignore nonce verification.
 		if ( !wp_verify_nonce( $_POST['tako_nonce'], plugin_basename( __FILE__ ) ) && $screen->parent_base == 'edit-comments' )
 			return;
 		if ( !current_user_can( 'moderate_comments' ) )  {
