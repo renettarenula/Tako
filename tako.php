@@ -2,11 +2,11 @@
 /**
  * @package Tako Movable Comments
  * @author Ren Aysha
- * @version 1.0.1
+ * @version 1.0.2
  */
 /*
 Plugin Name: Tako Movable Comments
-Version: 1.0.1
+Version: 1.0.2
 Plugin URI: https://github.com/renettarenula/Tako/
 Author: Ren Aysha
 Author URI: http://twitter.com/RenettaRenula
@@ -33,6 +33,7 @@ class Tako
 	/*--------------------------------------------*
 	 * Constructor
 	 *--------------------------------------------*/
+
 
 	/**
 	 * Initializes the plugin by adding meta box, filters, and JS files.
@@ -114,7 +115,8 @@ class Tako
 	 */
 	public function tako_save_meta_box( $comment_content ) 
 	{
-		if ( !wp_verify_nonce( $_POST['tako_nonce'], plugin_basename( __FILE__ ) ) )
+		$screen = get_current_screen();
+		if ( !wp_verify_nonce( $_POST['tako_nonce'], plugin_basename( __FILE__ ) ) && $screen->parent_base == 'edit-comments' )
 			return;
 		if ( !current_user_can( 'moderate_comments' ) )  {
 			return;
