@@ -2,7 +2,7 @@
 /**
  * @package Tako Movable Comments
  * @author Ren Aysha
- * @version 1.0.2
+ * @version 1.0.3
  */
 /*
 Plugin Name: Tako Movable Comments
