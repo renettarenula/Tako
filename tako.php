@@ -55,8 +55,8 @@ class Tako
 		wp_enqueue_script( 'tako_dropdown', plugins_url( 'js/tako-dropdown.js' , __FILE__ ) );
 		wp_localize_script( 'tako_dropdown', 'tako_object', array( 'tako_ajax_nonce' => wp_create_nonce( 'tako-ajax-nonce' ) ) );
 		// Chosen.js & css
-		wp_enqueue_script( 'tako_chosen', plugins_url( 'js/chosen.js', __FILE__ ) );
-		wp_enqueue_style( 'tako_chosen_style', plugins_url( 'css/chosen.css', __FILE__ ) );
+		wp_enqueue_script( 'tako_chosen', plugins_url( 'js/tako-chosen.js', __FILE__ ) );
+		wp_enqueue_style( 'tako_chosen_style', plugins_url( 'css/tako-chosen.css', __FILE__ ) );
 	}
 
 	/*--------------------------------------------*
