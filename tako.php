@@ -2,7 +2,7 @@
 /**
  * @package Tako Movable Comments
  * @author Ren Aysha
- * @version 1.0.3
+ * @version 1.0.4
  */
 /*
 Plugin Name: Tako Movable Comments
@@ -128,8 +128,9 @@ class Tako
 		if ( !wp_verify_nonce( $_POST['tako_nonce'], plugin_basename( __FILE__ ) ) && $screen->parent_base == 'edit-comments' )
 			return;
 		
+		// For Front-end edit: return comment_content in order to ensure that non-administrator can edit comments using other AJAX edit comments plugins
 		if ( !current_user_can( 'moderate_comments' ) )  {
-			return;
+			return $comment_content;
 		}
 		
 		$comment_post_ID = (int) $_POST['tako_post'];
