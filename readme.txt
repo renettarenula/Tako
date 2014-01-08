@@ -2,8 +2,8 @@
 
 Tags: comments, edit comments, change comment, nested comments, update comment, move comments, move bulk comments
 Requires at least: 3.0
-Tested up to: 3.6.1
-Stable tag: 1.0.4
+Tested up to: 3.8
+Stable tag: 1.0.5
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -16,6 +16,8 @@ This plugin allows you to move comments from one post or page to another. You ca
 By using this plugin in order to move comments, admins no longer need to manually insert the post ID number. Instead, admins can choose the post title through a drop down list. This allows admins to choose the post title that they want to move the comments to easily. Nested comments will also be automatically moved if the comment chosen to be moved has any nested comments under it. This plugin also allows admin to move WordPress comments in bulk. It has a bulk action that moves bulk comments automatically across posts, pages, and custom post types!
 
 In order to use the plugin, just click on edit comments and move your comments through the 'Move Comments with Tako' metabox.
+
+Notice: PHP5 is required since version 1.0.5!
 
 Features:
 
@@ -45,3 +47,4 @@ Email me at ren.aysha[at]gmail.com. Please include [tako-movable-comments] on th
 
 1. The Meta Box
 2. The Edit Comment Page with the Tako Meta Box
+3. Move bulk WordPress comments
