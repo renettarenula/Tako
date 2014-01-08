@@ -2,11 +2,11 @@
 /**
  * @package Tako Movable Comments
  * @author Ren Aysha
- * @version 1.0.4
+ * @version 1.0.5
  */
 /*
 Plugin Name: Tako Movable Comments
-Version: 1.0.4
+Version: 1.0.5
 Plugin URI: https://github.com/renettarenula/Tako/
 Author: Ren Aysha
 Author URI: http://twitter.com/RenettaRenula
@@ -28,6 +28,11 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+
+define( 'TAKO_DIR', dirname( __FILE__ ) );
+
+require TAKO_DIR . '/template.php';
+
 class Tako
 {
 	/*--------------------------------------------*
@@ -44,19 +49,23 @@ class Tako
 		add_filter( 'comment_save_pre', array( &$this, 'tako_save_meta_box' ) );
 		add_action( 'admin_enqueue_scripts', array( &$this, 'tako_load_scripts') );
 		add_action( 'wp_ajax_tako_chosen_post_type', array( &$this, 'tako_chosen_post_type_callback' ) );
+		add_action( 'admin_footer-edit-comments.php', array( &$this, 'tako_bulk_action_for_comments' ) );
+		add_action( 'admin_enqueue_scripts', array( &$this, 'tako_bulk_action_script' ) );
+		add_action( 'wp_ajax_tako_post_types', array( &$this, 'tako_post_types_callback' ) );
+		add_action( 'wp_ajax_tako_move_bulk', array( &$this, 'tako_move_bulk_callback' ) );
 	}
 
 	/**
 	 * Enqueue the CSS & JS file and ensure that it only loads in the edit comment page
 	 */
 	public function tako_load_scripts( $hook ) {
-		if ( $hook != 'comment.php' )
-			return;
-		wp_enqueue_script( 'tako_dropdown', plugins_url( 'js/tako-dropdown.js' , __FILE__ ) );
-		wp_localize_script( 'tako_dropdown', 'tako_object', array( 'tako_ajax_nonce' => wp_create_nonce( 'tako-ajax-nonce' ) ) );
-		// Chosen.js & css
-		wp_enqueue_script( 'tako_chosen', plugins_url( 'js/tako-chosen.js', __FILE__ ) );
-		wp_enqueue_style( 'tako_chosen_style', plugins_url( 'css/tako-chosen.css', __FILE__ ) );
+		if ( $hook == 'comment.php' || $hook == 'edit-comments.php' ) {
+			wp_enqueue_script( 'tako_dropdown', plugins_url( 'js/tako-dropdown.js' , __FILE__ ) );
+			wp_localize_script( 'tako_dropdown', 'tako_object', array( 'tako_ajax_nonce' => wp_create_nonce( 'tako-ajax-nonce' ) ) );
+			// Chosen.js & css
+			wp_enqueue_script( 'tako_chosen', plugins_url( 'js/tako-chosen.js', __FILE__ ) );
+			wp_enqueue_style( 'tako_chosen_style', plugins_url( 'css/tako-chosen.css', __FILE__ ) );
+		}
 	}
 
 	/*--------------------------------------------*
@@ -233,6 +242,35 @@ class Tako
 		return $comments_id;
 	}
 
+	/**
+	* Add a bulk action for the plugin. 
+	*/
+
+	public function tako_bulk_action_for_comments()
+	{	
+		$template = new TakoTemplate(
+			TAKO_DIR . '/views/script.view.php',
+			array(
+				'display' => __( 'Move Comments', 'tako_lang' )
+			)
+		);
+
+		$template->render();	
+	}
+
+	/**
+	* Bulk action script load
+	*/
+
+	public function tako_bulk_action_script( $hook )
+	{
+		if ( 'edit-comments.php' != $hook )
+			return;
+
+		wp_enqueue_script( 'tako_handlebars', plugins_url( 'js/handlebars.js', __FILE__ ), '', '', true );
+		wp_enqueue_style( 'tako_bulk_style', plugins_url( 'css/tako-bulk.css', __FILE__ ) );
+	}
+
 	/*--------------------------------------------*
 	 * Ajax Callback
 	 *--------------------------------------------*/
@@ -261,6 +299,74 @@ class Tako
 
 		echo json_encode( $result );
 		
+		die();
+	}
+
+	/**
+	* Ajax callback for passing a list of post type to bulk edit view
+	*/
+
+	public function tako_post_types_callback()
+	{
+		// check nonce
+		if ( !isset( $_REQUEST[ 'tako_ajax_nonce' ] ) || !wp_verify_nonce( $_REQUEST[ 'tako_ajax_nonce' ], 'tako-ajax-nonce' ) )
+			die( 'Permission Denied!' );
+			
+		$result = array();
+
+		$post_types = get_post_types( '', 'names' );
+
+		echo json_encode( $post_types );
+
+		die();
+	}
+
+	/**
+	* Ajax callback for moving bulk comments
+	*/
+
+	public function tako_move_bulk_callback()
+	{
+		global $wpdb;
+		// check nonce
+		if ( !isset( $_POST['tako_ajax_nonce'] ) || !wp_verify_nonce( $_POST['tako_ajax_nonce'], 'tako-ajax-nonce' ) )
+			die( 'Permission Denied!' );
+
+		$comment_ID = $the_posts = array(); 
+
+		$comments = json_decode( stripslashes( $_POST[ 'comments' ] ) );
+		$post_id = ( int ) $_POST[ 'post_id' ];
+		$the_post = get_post( $post_id );
+
+		foreach ( $comments as $comment ) {
+			$the_comment_ID = ( int ) $comment;
+			$comment_ID[] = $the_comment_ID;
+
+			$the_comment = get_comment( $the_comment_ID );
+			$the_posts[] = $the_comment->comment_post_ID;
+		}
+
+		$posts = array_unique( $the_posts );
+
+		$nested = $this->tako_get_subcomments( $comment_ID );
+		$comments_subs = implode( ',', array_map( 'intval', $nested ) );
+
+		$results = $wpdb->query( "UPDATE $wpdb->comments SET comment_post_ID = $post_id WHERE comment_ID IN ( $comments_subs )" );
+
+		// update number of comment for previous posts that the comments belong to
+		foreach ( $posts as $post ) {
+			wp_update_comment_count( $post );
+		}
+
+		// update number of comment for the post that comments are moved to
+		wp_update_comment_count( $post_id );
+
+		$success = array( 'comments' => $nested, 'post_id' => $post_id, 'title' => $the_post->post_title  );
+
+		$success[ 'success' ] = ( $results != false ) ? 1 : 0;
+
+		echo json_encode( $success );
+
 		die();
 	}
 }
