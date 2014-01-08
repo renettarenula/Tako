@@ -170,8 +170,6 @@ jQuery( document ).ready(function( $ ) {
 				fetch = $( this ).attr( 'checked' ) ?
 					self.fetch.push( parseInt( $( this ).val(), 10 ) ) :
 					self.unset( parseInt( $( this ).val(), 10 ) );
-
-				console.log( self.fetch );
 			});
 
 			return self.fetch;
@@ -270,7 +268,7 @@ jQuery( document ).ready(function( $ ) {
 
 				$.post( ajaxurl, data, function( response ) {
 					var responses = JSON.parse( response ), datum;	
-					console.log( responses );
+					
 					datum = { message: 'Successfully move comments!' };
 
 					if ( responses.success === 1 ) {
