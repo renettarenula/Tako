@@ -10,7 +10,7 @@ This plugin allows you to move comments from one post or page to another. You ca
 
 ## Description
 
-By using this plugin, admins no longer need to manually insert the post ID number. Instead, admins can choose the post title through a drop down list. This allows admins to choose the post title that they want to move the comments to easily. This plugin also allows admin to move comments in bulk. 
+By using this plugin, admins no longer need to manually insert the post ID number. Instead, admins can choose the post title through a drop down list. This allows admins to choose the post title that they want to move the comments to easily. This plugin also allows admin to move WordPress comments in bulk. It has a bulk action that moves bulk comments automatically across posts, pages, and custom post types!
 
 As of now, there are similar plugins that exist. However, these plugins require the admin to manually insert the post's ID number and they do not automatically move nested comments. Tako Movable Comments aims to enhance this feature and allow admins to move comments easily.
 
