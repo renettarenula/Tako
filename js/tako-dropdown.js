@@ -274,7 +274,10 @@ jQuery( document ).ready(function( $ ) {
 					if ( responses.success === 1 ) {
 						$( 'h2' ).append( tmpl( datum ) );
 						self.posts( responses );
-
+						
+						$( '[data-comment]' ).remove();
+						$( '#bulky-comment' ).css( 'display', 'none' );
+						
 						$( '#tako_bulk_spinner' ).hide();
 					} else {
 						datum.message = 'Comments are not moved. Are you sure you\'ve picked a post title that is different than the one that the comments currently belong to?';
