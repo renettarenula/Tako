@@ -6,17 +6,16 @@
 				<h4>Move Comments</h4>
 				<div id="bulk-title-div">
 				<div id="bulk-titles">
-					
 				</div>
 				</div>
 			</div>
 		</fieldset>
-		<fieldset class="inline-edit-col-center inline-edit-categories">
+		<fieldset class="inline-edit-col-center inline-edit-categories" style="width: 30%;">
 			<span class="title inline-edit-categories-label">Post Types</span>
-			<select name="tako_post_type" id="tako_post_type">
+			<select name="tako_post_type" id="tako_post_type" style="width: 80%">
 			</select>
 		</fieldset>
-		<fieldset class="inline-edit-col-center">
+		<fieldset class="inline-edit-col-center" style="width: 30%;">
 		<span class="title inline-edit-categories-label">Posts</span>
 			<select name="tako_post" id="tako_post">
 			</select>
