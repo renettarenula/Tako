@@ -129,7 +129,7 @@ class Tako
 	 */
 	public function tako_save_meta_box( $comment_content )
 	{
-		global $wpdb, $comment;
+		global $wpdb;
 
 		$screen = get_current_screen();
 
