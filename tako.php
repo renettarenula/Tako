@@ -145,6 +145,10 @@ class Tako
 		$comment_post_ID = (int) $_POST['tako_post'];
 		$comment_ID = (int) $_POST['comment_ID'];
 
+		// Retrieve the comment's current post ID so we can update count later
+		$comment = get_comment($comment_ID);
+		$old_post_ID = (int) $comment->comment_post_ID;
+
 		// if post doesn't exist
 		if ( !$this->tako_post_exist( $comment_post_ID ) )
 			return $comment_content;
@@ -162,6 +166,8 @@ class Tako
 			$wpdb->query( "UPDATE $wpdb->comments SET comment_post_ID = $comment_post_ID WHERE comment_ID IN ( $val )" );
 		}
 
+		// Update comment counts
+		wp_update_comment_count( $old_post_ID );
 		wp_update_comment_count( $comment_post_ID );
 
 		return $comment_content;
