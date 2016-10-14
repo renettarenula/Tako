@@ -2,17 +2,17 @@
 /**
  * @package Tako Movable Comments
  * @author Ren Aysha
- * @version 1.0.6
+ * @version 1.0.7
  */
 /*
 Plugin Name: Tako Movable Comments
-Version: 1.0.6
+Version: 1.0.7
 Plugin URI: https://github.com/renettarenula/Tako/
 Author: Ren Aysha
 Author URI: http://twitter.com/RenettaRenula
 Description: This plugin allows you to move comments from one post or page to another. You can also move comments across post types and custom post types. Just click on edit comments and move your comments through the <strong>Move Comments with Tako</strong> metabox.
 
-Copyright (C) <2013> <Ren Aysha>
+Copyright (C) <2016> <Ren Aysha>
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
